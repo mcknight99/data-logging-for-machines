@@ -174,17 +174,17 @@ void machineOff()
     time_t off_time_ctime = time(0); // record ctime in case API fails here
     String off_time = getFormattedDateTime();
     digitalWrite(LED_PIN, LOW); // Turn off LED
-    // if (off_time == "TIMEOUT" || latest_on_time == "TIMEOUT")
-    // {
-    //     time_t delta_time = off_time_ctime - latest_on_time_ctime;
-    //     if(DEBUG)
-    //         //Serial.println("Machine OFF" + ctime(&off_time_ctime) + " ; Uptime: " + ctime(&delta_time));
-    // }
-    // else
-    // {
-    //     if(DEBUG)
-    //         Serial.println("Machine OFF" + getFormattedDateTime() + " ; Uptime: " + getDeltaTime(latest_on_time, getFormattedDateTime()));
-    // }
+    if (off_time == "TIMEOUT" || latest_on_time == "TIMEOUT")
+    {
+        // time_t delta_time = off_time_ctime - latest_on_time_ctime;
+        // if(DEBUG)
+            //Serial.println("Machine OFF" + ctime(&off_time_ctime) + " ; Uptime: " + ctime(&delta_time));
+    }
+    else
+    {
+        if(DEBUG)
+            Serial.println("Machine OFF" + getFormattedDateTime() + " ; Uptime: " + getDeltaTime(latest_on_time, getFormattedDateTime()));
+    }
 }
 
 bool isMachineOn()
