@@ -22,7 +22,7 @@ String extractDate(String payload);
 String getFormattedDateTime();
 bool isMachineOn();
 bool isMachineOff();
-String getDeltaTime();
+String getDeltaTime(String on, String off);
 
 void setup()
 {
