@@ -18,6 +18,13 @@ int readFSR(int pin) {
 // If the analog state is 0, the FSR is pressed when the FSR value is below the threshold
 void analyzeFSR(int fsrValue1, int fsrValue2) {
     
+    if(DEBUG && false) { // Change false to true to enable analog reading prints, because this can be very annoying 
+        Serial.print("FSR1: ");
+        Serial.print(fsrValue1);
+        Serial.print("\t|\t FSR2: ");
+        Serial.println(fsrValue2);
+    }
+
     if (ANALOG_STATE == 1) {
         if (fsrValue1 > THRESHOLD && isMachineOff()) machineOn();
         if (fsrValue2 > THRESHOLD && isMachineOn()) machineOff();

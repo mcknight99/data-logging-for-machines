@@ -5,6 +5,7 @@
 // Precondition: WiFi is connected
 String sendDateTimeRequest()
 {
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     auto ipv4 = WiFi.localIP();
     if (DEBUG)
     {
@@ -19,6 +20,7 @@ String sendDateTimeRequest()
     http.end();                        // Close connection
     if (DEBUG)
         Serial.println("API response: " + payload);
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     return payload; // Return payload
 }
 
@@ -40,6 +42,8 @@ String getFormattedDateTime()
     String time = extractTime(payload);     // Extract time
     String date = extractDate(payload);     // Extract date
 
+    // save initial LED state
+    bool ledState = digitalRead(LED_PIN);
     // if time or date are empty, retry API request up to API_TIMEOUT times
     int attempts = 0;
     while (time == "" || date == "")
@@ -53,7 +57,10 @@ String getFormattedDateTime()
         time = extractTime(payload);     // Extract time
         date = extractDate(payload);     // Extract date
         attempts++;                      // Increment attempts
+        digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     }
+    // rewrite the LED state to what it was before
+    digitalWrite(LED_PIN, ledState);
     return date + " " + time; // Return date and time
 }
 
@@ -145,13 +152,14 @@ bool sendToWebApp(String on_time, String off_time, String uptime)
 
     if (httpResponseCode > 0)
     {
-        if (DEBUG) 
+        if (DEBUG)
             Serial.println("Response Code: " + String(httpResponseCode));
         return true;
     }
     else
     {
-        if (DEBUG) {
+        if (DEBUG)
+        {
             Serial.println("Error sending request: " + String(httpResponseCode));
             Serial.println(http.getString());
             Serial.println("WiFi status: " + String(WiFi.status()));
@@ -172,17 +180,26 @@ bool uploadHandler(String on_time, String off_time, String uptime)
     time_t begin_requests = millis();
     bool sent = false;
 
+    // get led state before blinking
+    bool ledState = digitalRead(LED_PIN);
     do
     {
         sent = sendToWebApp(on_time, off_time, uptime);
         if (sent)
         {
+            // rewrite the LED state to what it was before
+            digitalWrite(LED_PIN, ledState);
             return true;
         }
+        delay(3000);
+        digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+
     } while (!sent || millis() - begin_requests < UPLOAD_TIMEOUT);
 
     if (!sent && DEBUG)
         Serial.println("Data upload timeout");
 
+    // rewrite the LED state to what it was before
+    digitalWrite(LED_PIN, ledState);
     return sent;
 }
