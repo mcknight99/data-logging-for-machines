@@ -7,6 +7,15 @@
 #include "auth.h"
 #include "wifi_handler.h"
 
+struct DataLog{
+    String on_time;
+    String off_time;
+    String uptime;
+};
+
+// Global Variable Declaration; do not touch
+extern std::vector<DataLog> data_log_backlog;
+
 String sendDateTimeRequest(); // Send API request for date and time using IP address
 String extractTime(String payload); // Extract time string from payload in format HH:MM:SS
 String extractDate(String payload); // Extract date string from payload in format YYYY-MM-DD

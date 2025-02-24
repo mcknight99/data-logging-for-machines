@@ -19,9 +19,10 @@
 #include "datetime_handler.h"
 #include "state_handler.h"
 
-int machine_state = 0;
-String latest_on_time = "";
-time_t latest_on_time_ctime = time(0);
+int machine_state = 0; // set machine state to off by default
+String latest_on_time = ""; // initialize latest on time to empty string
+time_t latest_on_time_ctime = time(0); // initialize latest on time ctime to arbitrary current time
+std::vector<DataLog> data_log_backlog = {}; // initialize data log backlog to empty vector
 
 void setup()
 {
@@ -33,10 +34,6 @@ void setup()
     pinMode(OPENSTATEPIN2, OUTPUT);
     digitalWrite(OPENSTATEPIN1, !ANALOG_STATE);
     digitalWrite(OPENSTATEPIN2, !ANALOG_STATE);
-
-    machine_state = 0;              // Set machine state to off
-    latest_on_time = "";            // Set latest on time to empty string
-    latest_on_time_ctime = time(0); // Set latest on time ctime to current time
 
     for(int i = 0; i < 3; i++)
     {

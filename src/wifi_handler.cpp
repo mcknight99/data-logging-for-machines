@@ -6,7 +6,8 @@
 // Will return false if connection attempt times out
 bool connectToWiFi()
 {
-    Serial.print("Connecting to WiFi");
+    if (DEBUG)
+        Serial.print("Connecting to WiFi");
     bool ledState = digitalRead(LED_PIN);
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     WiFi.begin(WIFI_SSID, WIFI_PASS);
@@ -24,7 +25,8 @@ bool connectToWiFi()
             return false;
         }
         delay(1000); // Small delay to avoid spam
-        if(DEBUG) Serial.print(".");
+        if (DEBUG)
+            Serial.print(".");
     }
     if (DEBUG)
         Serial.println("\nConnected to WiFi");
