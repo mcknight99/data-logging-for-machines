@@ -13,7 +13,7 @@ String sendDateTimeRequest()
         Serial.println(String(ipv4[0]) + "." + String(ipv4[1]) + "." + String(ipv4[2]) + "." + String(ipv4[3]));
     }
     HTTPClient http; // Declare HTTPClient object
-    String httpAddress = "https://timeapi.io/api/time/current/ip?ipAddress=" + String(ipv4[0]) + "." + String(ipv4[1]) + "." + String(ipv4[2]) + "." + String(ipv4[3]);
+    String httpAddress = "https://timeapi.io/api/time/current/zone?timeZone=America%2FNew_York"; // API address
     http.begin(httpAddress);           // Connect to API
     int httpResponseCode = http.GET(); // Get response from API
     String payload = http.getString(); // Get payload
