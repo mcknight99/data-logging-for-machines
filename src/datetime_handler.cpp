@@ -1,41 +1,46 @@
 #include "datetime_handler.h"
 
 // Function to send API request for date and time
-// Returns payload from API
+// Returns payload from API call for dateTime
 // Precondition: WiFi is connected
 String sendDateTimeRequest()
 {
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    auto ipv4 = WiFi.localIP();
     if (DEBUG)
-    {
-        Serial.print("Sending API request for timezone of the following IP address: ");
-        Serial.println(String(ipv4[0]) + "." + String(ipv4[1]) + "." + String(ipv4[2]) + "." + String(ipv4[3]));
-    }
+        Serial.print("Sending API request for EST timezone (America New York)");
+    
     HTTPClient http; // Declare HTTPClient object
     String httpAddress = "https://timeapi.io/api/time/current/zone?timeZone=America%2FNew_York"; // API address
+
     http.begin(httpAddress);           // Connect to API
     int httpResponseCode = http.GET(); // Get response from API
     String payload = http.getString(); // Get payload
     http.end();                        // Close connection
+
     if (DEBUG)
-        Serial.println("API response: " + payload);
+        Serial.println("Response code: " + String(httpResponseCode) + "\nPayload: " + payload);
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     return payload; // Return payload
 }
 
+// Function to extract time from payload
+// Returns time string in format HH:MM:SS
 String extractTime(String payload)
 {
     int timeIndex = payload.indexOf("dateTime") + 22;
     return payload.substring(timeIndex, timeIndex + 8);
 }
 
+// Function to extract date from payload
+// Returns date string in format YYYY-MM-DD
 String extractDate(String payload)
 {
     int dateIndex = payload.indexOf("dateTime") + 11;
     return payload.substring(dateIndex, dateIndex + 10);
 }
 
+// Function to get formatted date and time string
+// Returns formatted date and time string as "YYYY-MM-DD HH:MM:SS"
 String getFormattedDateTime()
 {
     String payload = sendDateTimeRequest(); // Get payload from API
@@ -64,6 +69,8 @@ String getFormattedDateTime()
     return date + " " + time; // Return date and time
 }
 
+// Function to get delta time string from time between on and off time strings
+// Returns delta time string as "HH:MM:SS" 
 String getDeltaTime(String on, String off)
 {
     int on_year = on.substring(0, 4).toInt();
@@ -133,7 +140,7 @@ String getDeltaTime(String on, String off)
     return out;
 }
 
-// Function to send data to web app
+// Function to send machine on, machine off, and uptime data to web app
 // Returns true if successful, false if not
 // Precondition: WiFi is connected
 bool sendToWebApp(String on_time, String off_time, String uptime)
@@ -153,14 +160,14 @@ bool sendToWebApp(String on_time, String off_time, String uptime)
     if (httpResponseCode > 0)
     {
         if (DEBUG)
-            Serial.println("Response Code: " + String(httpResponseCode));
+            Serial.println("Response code: " + String(httpResponseCode));
         return true;
     }
     else
     {
         if (DEBUG)
         {
-            Serial.println("Error sending request: " + String(httpResponseCode));
+            Serial.println("Error sending request, response code: " + String(httpResponseCode));
             Serial.println(http.getString());
             Serial.println("WiFi status: " + String(WiFi.status()));
         }
@@ -171,8 +178,7 @@ bool sendToWebApp(String on_time, String off_time, String uptime)
     return false;
 }
 
-// Upload handler
-// Sends on_time, off_time, and uptime to web app
+// Upload handler ensures proper data upload to web app using the sendToWebApp function
 // Will time out after UPLOAD_TIMEOUT ms
 // Returns true if successful, false if not
 bool uploadHandler(String on_time, String off_time, String uptime)
